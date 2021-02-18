@@ -16,18 +16,21 @@ def parsing(ws, url):
 
     data_section = soup.find('a', class_ = 'js-popup-open button big invert w250')['data-section']
     data_con = soup.find('div', class_ = 'org-heading-right')['data-con']
+    i_add = 0
     for master in soup.find_all('div', class_ = 'executors-block type2'):
         for zakaz in master.find_all('div', class_ = 'org-table-row'):
             #if not zakaz.get('data-f', '').startswith('f-'): continue
+            if zakaz.find('div', class_ = 'org-table-col price') is None: continue
             description = zakaz.find('div', class_ = 'org-table-col short-desc')
-            if not description is None: 
-                description = description.text.replace('\n', '').lstrip().rstrip()
-            else:
-                continue
+            if not description is None: description = description.text.replace('\n', '').lstrip().rstrip()
             description_full = zakaz.find('div', class_ = 'org-table-row-hidden-text description full-desc')
             if not description_full is None: description_full = description_full.text.replace('\n', '').lstrip().rstrip()
-            if description is None: continue
+            
             ws.append([url, h1, description, description_full, data_section, data_con, zakaz.get('data-f')])
+            i_add += 1
+    print(i_add)
+    for _ in range(30 - i_add):
+        ws.append([url, h1, '', '', data_section, data_con, zakaz.get('data-f')])
     ws.append([])
     set_fill(ws, ws.max_row + 1, FILL_SPLIT)
 
