@@ -18,17 +18,22 @@ def parsing(ws, url):
     data_con = soup.find('div', class_ = 'org-heading-right')['data-con']
     for master in soup.find_all('div', class_ = 'executors-block type2'):
         for zakaz in master.find_all('div', class_ = 'org-table-row'):
-            if not zakaz.get('data-f', '').startswith('f-'): continue
+            #if not zakaz.get('data-f', '').startswith('f-'): continue
             description = zakaz.find('div', class_ = 'org-table-col short-desc')
+            if not description is None: 
+                description = description.text.replace('\n', '').lstrip().rstrip()
+            else:
+                continue
             description_full = zakaz.find('div', class_ = 'org-table-row-hidden-text description full-desc')
-            if not description is None: description = description.text.replace('\n', '').lstrip().rstrip()
             if not description_full is None: description_full = description_full.text.replace('\n', '').lstrip().rstrip()
-            #print()
+            if description is None: continue
             ws.append([url, h1, description, description_full, data_section, data_con, zakaz.get('data-f')])
     ws.append([])
     set_fill(ws, ws.max_row + 1, FILL_SPLIT)
 
+#<a href="javascript:void(0)" type="button" class="org-table-row-link active">Положить</a>
 
+#<div class="org-table-col short-desc">Общий массаж тела  </div>
 
 def main():
     with open('urls.txt') as f: base_urls = tuple(f.read().split('\n'))
